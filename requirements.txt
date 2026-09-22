@@ -1,0 +1,6 @@
+streamlit
+langchain
+langchain-core
+langchain-openai
+scikit-fuzzy
+numpy
