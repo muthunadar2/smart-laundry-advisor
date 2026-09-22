@@ -1,16 +1,17 @@
 import json
-import os
 from typing import Dict, Any
 
+import streamlit as st
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
 
 def _llm():
-    token = os.getenv("HF_TOKEN")
-
-    if not token:
-        raise RuntimeError("HF_TOKEN is not configured.")
+    # Get the Hugging Face token securely from Streamlit Secrets
+    try:
+        token = st.secrets["HF_TOKEN"]
+    except Exception:
+        raise RuntimeError("HF_TOKEN is not configured in Streamlit Secrets.")
 
     return ChatOpenAI(
         model="openai/gpt-oss-120b:fastest",
@@ -30,17 +31,17 @@ def extract_laundry_info(text: str) -> Dict[str, Any]:
 
 Return ONLY valid JSON with these keys:
 load_kg (number from 0 to 10),
-dirt_level (integer 0 to 100),
-water_saving (integer 0 to 100),
+dirt_level (integer from 0 to 100),
+water_saving (integer from 0 to 100),
 fabric (short string).
 
-Interpret natural language reasonably.
+Interpret the user's laundry description reasonably.
 
-If a value is not provided, use:
+If a value is not provided, use these defaults:
 load_kg=5,
 dirt_level=50,
 water_saving=50,
-fabric='Mixed'.
+fabric="Mixed".
 
 Do not include markdown or extra text."""
         ),
